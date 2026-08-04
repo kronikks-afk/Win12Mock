@@ -12,8 +12,9 @@
     <div class="login-card">
       <div class="user-avatar">👤</div>
       <h2>Welcome Back</h2>
-      <input type="password" id="loginPass" placeholder="Enter PIN or press Login" onkeydown="if(event.key==='Enter') unlockDesktop()">
+      <input type="password" id="loginPass" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') unlockDesktop()">
       <button onclick="unlockDesktop()">Log In</button>
+      <div id="loginError" style="color: #ff4757; font-size: 12px; display: none; margin-top: -5px;">Incorrect PIN</div>
     </div>
   </div>
 
@@ -46,6 +47,10 @@
       <div class="icon-img">💣</div>
       <span>Minesweeper</span>
     </div>
+    <div class="desktop-icon" onclick="openApp('files')">
+      <div class="icon-img">📁</div>
+      <span>Files</span>
+    </div>
   </div>
 
   <div class="app-window" id="appWindow">
@@ -57,8 +62,7 @@
         <button class="win-btn close" onclick="closeWindow()">&#10005;</button>
       </div>
     </div>
-    <div class="window-body" id="windowBody">
-      </div>
+    <div class="window-body" id="windowBody"></div>
   </div>
 
   <div class="start-menu" id="startMenu">
@@ -94,6 +98,10 @@
         <div class="start-icon">⚙️</div>
         <span>Settings</span>
       </div>
+      <div class="start-item" onclick="openApp('files')">
+        <div class="start-icon">📁</div>
+        <span>Files</span>
+      </div>
     </div>
   </div>
 
@@ -113,6 +121,7 @@
   <div class="toast" id="toastNotification">Notification</div>
 
   <audio id="spotifyAudio"></audio>
+  <input type="file" id="mp3Uploader" accept="audio/mp3,audio/*" style="display: none;" onchange="handleMp3Upload(event)">
 
   <script src="index.js"></script>
 </body>
