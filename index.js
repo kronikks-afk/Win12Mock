@@ -7,6 +7,9 @@ const tracks = [
 ];
 let currentTrackIdx = 0;
 
+// Embedded Gemini API Key
+const GEMINI_API_KEY = "AQ.Ab8RN6LrdCOeLLTN1U7JmcBOjm2IhgQFOzGNqS2k7JT5MqZtPw";
+
 // Unlock Desktop Function
 function unlockDesktop() {
   const passInput = document.getElementById('loginPass');
@@ -99,14 +102,12 @@ function openApp(appKey) {
       title.innerHTML = `<span>🎧</span> Spotify`;
       body.innerHTML = `
         <div style="display: flex; flex-direction: column; height: 100%; background: #121212; color: white; padding: 20px; box-sizing: border-box; font-family: sans-serif;">
-          
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0; font-size: 16px;">Your Library</h3>
             <button onclick="document.getElementById('mp3Uploader').click()" style="background: #1db954; color: white; border: none; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 12px;">
               📁 Upload MP3
             </button>
           </div>
-
           <div style="display: flex; align-items: center; gap: 20px; background: #181818; padding: 15px; border-radius: 8px;">
             <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1db954, #191414); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 32px;">🎵</div>
             <div>
@@ -114,11 +115,9 @@ function openApp(appKey) {
               <div id="trackArtist" style="color: #b3b3b3; font-size: 14px; margin-top: 4px;">${tracks[currentTrackIdx] ? tracks[currentTrackIdx].artist : ''}</div>
             </div>
           </div>
-          
           <div id="playlistContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 180px;">
             ${renderPlaylist()}
           </div>
-
           <div style="margin-top: auto; background: #181818; padding: 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
             <button onclick="prevTrack()" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">⏮</button>
             <button id="playBtn" onclick="toggleAudio()" style="background: #1db954; border: none; color: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 16px;">${isPlaying ? '⏸' : '▶'}</button>
@@ -189,7 +188,7 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
       body.innerHTML = `
         <div class="copilot-container">
           <div class="chat-history" id="chatHistory">
-            <div class="chat-bubble ai">Hello! I am Windows 12 Copilot. How can I assist you today?</div>
+            <div class="chat-bubble ai">Hello! I am Windows 12 Copilot powered by Google Gemini. How can I assist you today?</div>
           </div>
           <div class="chat-input-box">
             <input type="text" id="copilotInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') sendCopilotMsg()">
@@ -632,41 +631,72 @@ function handleTermCommand(event) {
   }
 }
 
-// Copilot Engine
-function sendCopilotMsg() {
+/* REAL AI COPILOT ENGINE (GEMINI API) */
+async function sendCopilotMsg() {
   const input = document.getElementById('copilotInput');
   const history = document.getElementById('chatHistory');
   if (!input || !input.value.trim()) return;
 
   const userText = input.value.trim();
-  history.innerHTML += `<div class="chat-bubble user">${userText}</div>`;
+  
+  // Render user message safely
+  history.innerHTML += `<div class="chat-bubble user">${escapeHtml(userText)}</div>`;
   input.value = '';
+  history.scrollTop = history.scrollHeight;
 
-  setTimeout(() => {
-    let response = generateAIResponse(userText);
-    history.innerHTML += `<div class="chat-bubble ai">${response}</div>`;
-    history.scrollTop = history.scrollHeight;
-  }, 400);
+  // Temporary "Thinking" indicator
+  const typingId = 'typing-' + Date.now();
+  history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Copilot is thinking...</i></div>`;
+  history.scrollTop = history.scrollHeight;
+
+  // Fetch from Gemini AI API
+  const aiResponse = await fetchRealAIResponse(userText);
+
+  // Update with actual response
+  const typingBubble = document.getElementById(typingId);
+  if (typingBubble) {
+    typingBubble.innerHTML = escapeHtml(aiResponse);
+  }
+  history.scrollTop = history.scrollHeight;
 }
 
-function generateAIResponse(text) {
-  const lower = text.toLowerCase();
-  
-  if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
-    return "Hello! How can I assist you with your Windows 12 system today?";
+async function fetchRealAIResponse(userMessage) {
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+  const systemInstruction = `You are Windows 12 Copilot, a helpful and intelligent AI assistant inside the Windows 12 Web Concept OS. Keep answers concise, direct, helpful, and friendly. Users can interact with built-in apps like Spotify, Snake, Minesweeper, Settings, Terminal, and Edge Browser.`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: {
+          parts: [{ text: systemInstruction }]
+        },
+        contents: [{
+          parts: [{ text: userMessage }]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+      return data.candidates[0].content.parts[0].text;
+    } else if (data.error) {
+      return `API Error: ${data.error.message || 'Check your key permissions.'}`;
+    } else {
+      return "I couldn't process that response right now. Please try again!";
+    }
+  } catch (error) {
+    console.error("Gemini API Request Failed:", error);
+    return "Error connecting to AI server. Please check your network connection.";
   }
-  if (lower.includes('doing') || lower.includes('how are you')) {
-    return "I'm running smoothly! All systems operational. How are you holding up?";
-  }
-  if (lower.includes('sad') || lower.includes('bad') || lower.includes('help')) {
-    return "I'm here for you! Taking a breather or listening to some lofi tunes in the Spotify app can help turn things around.";
-  }
-  if (lower.includes('game') || lower.includes('play')) {
-    return "You can play Snake or Minesweeper right from the desktop shortcuts or Start menu!";
-  }
-  if (lower.includes('wallpaper') || lower.includes('theme')) {
-    return "Open Settings from the desktop to upload a custom wallpaper or toggle themes!";
-  }
-  
-  return `I understand you said "${text}". You can ask me about system settings, games, terminal commands, or changing wallpapers!`;
+}
+
+// Utility to escape HTML to prevent XSS injection in chat bubbles
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.innerText = text;
+  return div.innerHTML;
 }
