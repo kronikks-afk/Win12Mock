@@ -8,7 +8,7 @@ const tracks = [
 let currentTrackIdx = 0;
 
 // Embedded Gemini API Key
-const GEMINI_API_KEY = "AQ.Ab8RN6LrdCOeLLTN1U7JmcBOjm2IhgQFOzGNqS2k7JT5MqZtPw";
+const GEMINI_API_KEY = "AQ.Ab8RN6JXLDciN5ELE-gLywA-JCG5Ukm0BQzZ-PzBdpvjXYC3EA";
 
 // Unlock Desktop Function
 function unlockDesktop() {
