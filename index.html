@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows 12 Web Concept</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="user-avatar">👤</div>
+      <h2>Welcome Back</h2>
+      <input type="password" id="loginPass" placeholder="Enter PIN or press Login" onkeydown="if(event.key==='Enter') unlockDesktop()">
+      <button onclick="unlockDesktop()">Log In</button>
+    </div>
+  </div>
+
+  <div class="desktop">
+    <div class="desktop-icon" onclick="openApp('terminal')">
+      <div class="icon-img">>_</div>
+      <span>Terminal</span>
+    </div>
+    <div class="desktop-icon" onclick="openApp('browser')">
+      <div class="icon-img">🌐</div>
+      <span>Edge</span>
+    </div>
+    <div class="desktop-icon" onclick="openApp('copilot')">
+      <div class="icon-img">🤖</div>
+      <span>Copilot</span>
+    </div>
+    <div class="desktop-icon" onclick="openApp('settings')">
+      <div class="icon-img">⚙️</div>
+      <span>Settings</span>
+    </div>
+    <div class="desktop-icon" onclick="openApp('spotify')">
+      <div class="icon-img">🎧</div>
+      <span>Spotify</span>
+    </div>
+    <div class="desktop-icon" onclick="openApp('snake')">
+      <div class="icon-img">🐍</div>
+      <span>Snake</span>
+    </div>
+    <div class="desktop-icon" onclick="openApp('minesweeper')">
+      <div class="icon-img">💣</div>
+      <span>Minesweeper</span>
+    </div>
+  </div>
+
+  <div class="app-window" id="appWindow">
+    <div class="window-header">
+      <div class="window-title" id="windowTitle"><span>🖥️</span> Application</div>
+      <div class="window-controls">
+        <button class="win-btn min" onclick="minimizeWindow()">&#8722;</button>
+        <button class="win-btn max" onclick="maximizeWindow()">&#9633;</button>
+        <button class="win-btn close" onclick="closeWindow()">&#10005;</button>
+      </div>
+    </div>
+    <div class="window-body" id="windowBody">
+      </div>
+  </div>
+
+  <div class="start-menu" id="startMenu">
+    <div class="start-search">
+      <input type="text" placeholder="Type here to search...">
+    </div>
+    <div class="start-grid">
+      <div class="start-item" onclick="openApp('terminal')">
+        <div class="start-icon">>_</div>
+        <span>Terminal</span>
+      </div>
+      <div class="start-item" onclick="openApp('browser')">
+        <div class="start-icon">🌐</div>
+        <span>Edge</span>
+      </div>
+      <div class="start-item" onclick="openApp('copilot')">
+        <div class="start-icon">🤖</div>
+        <span>Copilot</span>
+      </div>
+      <div class="start-item" onclick="openApp('spotify')">
+        <div class="start-icon">🎧</div>
+        <span>Spotify</span>
+      </div>
+      <div class="start-item" onclick="openApp('snake')">
+        <div class="start-icon">🐍</div>
+        <span>Snake</span>
+      </div>
+      <div class="start-item" onclick="openApp('minesweeper')">
+        <div class="start-icon">💣</div>
+        <span>Minesweeper</span>
+      </div>
+      <div class="start-item" onclick="openApp('settings')">
+        <div class="start-icon">⚙️</div>
+        <span>Settings</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="taskbar">
+    <div class="start-btn" onclick="toggleStartMenu()">❖</div>
+    <div class="taskbar-apps">
+      <div class="taskbar-icon" onclick="openApp('terminal')">>_</div>
+      <div class="taskbar-icon" onclick="openApp('browser')">🌐</div>
+      <div class="taskbar-icon" onclick="openApp('copilot')">🤖</div>
+      <div class="taskbar-icon" onclick="openApp('spotify')">🎧</div>
+      <div class="taskbar-icon" onclick="openApp('snake')">🐍</div>
+      <div class="taskbar-icon" onclick="openApp('minesweeper')">💣</div>
+    </div>
+    <div class="clock-widget" id="clock">12:00 PM</div>
+  </div>
+
+  <div class="toast" id="toastNotification">Notification</div>
+
+  <audio id="spotifyAudio"></audio>
+
+  <script src="index.js"></script>
+</body>
+</html>
