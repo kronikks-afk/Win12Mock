@@ -11,117 +11,97 @@
   <div class="login-screen" id="loginScreen">
     <div class="login-card">
       <div class="user-avatar">👤</div>
-      <h2>Welcome Back</h2>
-      <input type="password" id="loginPass" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') unlockDesktop()">
-      <button onclick="unlockDesktop()">Log In</button>
-      <div id="loginError" style="color: #ff4757; font-size: 12px; display: none; margin-top: -5px;">Incorrect PIN</div>
-    </div>
-  </div>
-
-  <div class="desktop">
-    <div class="desktop-icon" onclick="openApp('terminal')">
-      <div class="icon-img">>_</div>
-      <span>Terminal</span>
-    </div>
-    <div class="desktop-icon" onclick="openApp('browser')">
-      <div class="icon-img">🌐</div>
-      <span>Edge</span>
-    </div>
-    <div class="desktop-icon" onclick="openApp('copilot')">
-      <div class="icon-img">🤖</div>
-      <span>Copilot</span>
-    </div>
-    <div class="desktop-icon" onclick="openApp('settings')">
-      <div class="icon-img">⚙️</div>
-      <span>Settings</span>
-    </div>
-    <div class="desktop-icon" onclick="openApp('spotify')">
-      <div class="icon-img">🎧</div>
-      <span>Spotify</span>
-    </div>
-    <div class="desktop-icon" onclick="openApp('snake')">
-      <div class="icon-img">🐍</div>
-      <span>Snake</span>
-    </div>
-    <div class="desktop-icon" onclick="openApp('minesweeper')">
-      <div class="icon-img">💣</div>
-      <span>Minesweeper</span>
-    </div>
-    <div class="desktop-icon" onclick="openApp('files')">
-      <div class="icon-img">📁</div>
-      <span>Files</span>
-    </div>
-  </div>
-
-  <div class="app-window" id="appWindow">
-    <div class="window-header">
-      <div class="window-title" id="windowTitle"><span>🖥️</span> Application</div>
-      <div class="window-controls">
-        <button class="win-btn min" onclick="minimizeWindow()">&#8722;</button>
-        <button class="win-btn max" onclick="maximizeWindow()">&#9633;</button>
-        <button class="win-btn close" onclick="closeWindow()">&#10005;</button>
+      <h2>User</h2>
+      <div class="pin-container">
+        <input type="password" id="loginPass" placeholder="PIN (734233)" onkeydown="if(event.key==='Enter') unlockDesktop()">
+        <button onclick="unlockDesktop()">→</button>
       </div>
+      <div class="login-error" id="loginError" style="display:none;">Incorrect PIN. Try 734233</div>
     </div>
-    <div class="window-body" id="windowBody"></div>
   </div>
 
-  <div class="start-menu" id="startMenu">
-    <div class="start-search">
-      <input type="text" placeholder="Type here to search...">
-    </div>
-    <div class="start-grid">
-      <div class="start-item" onclick="openApp('terminal')">
-        <div class="start-icon">>_</div>
-        <span>Terminal</span>
-      </div>
-      <div class="start-item" onclick="openApp('browser')">
-        <div class="start-icon">🌐</div>
+  <div class="desktop" id="desktop">
+    <div class="desktop-grid">
+      <div class="desktop-icon" onclick="openApp('edge')">
+        <div class="icon-img">🌐</div>
         <span>Edge</span>
       </div>
-      <div class="start-item" onclick="openApp('copilot')">
-        <div class="start-icon">🤖</div>
+      <div class="desktop-icon" onclick="openApp('copilot')">
+        <div class="icon-img">🤖</div>
         <span>Copilot</span>
       </div>
-      <div class="start-item" onclick="openApp('spotify')">
-        <div class="start-icon">🎧</div>
-        <span>Spotify</span>
-      </div>
-      <div class="start-item" onclick="openApp('snake')">
-        <div class="start-icon">🐍</div>
-        <span>Snake</span>
-      </div>
-      <div class="start-item" onclick="openApp('minesweeper')">
-        <div class="start-icon">💣</div>
-        <span>Minesweeper</span>
-      </div>
-      <div class="start-item" onclick="openApp('settings')">
-        <div class="start-icon">⚙️</div>
+      <div class="desktop-icon" onclick="openApp('settings')">
+        <div class="icon-img">⚙️</div>
         <span>Settings</span>
       </div>
-      <div class="start-item" onclick="openApp('files')">
-        <div class="start-icon">📁</div>
+      <div class="desktop-icon" onclick="openApp('spotify')">
+        <div class="icon-img">🎧</div>
+        <span>Spotify</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('snake')">
+        <div class="icon-img">🐍</div>
+        <span>Snake</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('minesweeper')">
+        <div class="icon-img">💣</div>
+        <span>Minesweeper</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('files')">
+        <div class="icon-img">📁</div>
         <span>Files</span>
       </div>
+      <div class="desktop-icon" onclick="openApp('terminal')">
+        <div class="icon-img">>_</div>
+        <span>Terminal</span>
+      </div>
+    </div>
+
+    <div class="app-window" id="appWindow">
+      <div class="window-header" onmousedown="initialiseDrag(event)">
+        <div class="window-title" id="windowTitle"><span>📂</span> Application</div>
+        <div class="window-controls">
+          <button onclick="minimizeWindow()">🗕</button>
+          <button onclick="maximizeWindow()">🗖</button>
+          <button class="close-btn" onclick="closeWindow()">✕</button>
+        </div>
+      </div>
+      <div class="window-body" id="windowBody">
+        </div>
     </div>
   </div>
 
   <div class="taskbar">
-    <div class="start-btn" onclick="toggleStartMenu()">❖</div>
-    <div class="taskbar-apps">
-      <div class="taskbar-icon" onclick="openApp('terminal')">>_</div>
-      <div class="taskbar-icon" onclick="openApp('browser')">🌐</div>
-      <div class="taskbar-icon" onclick="openApp('copilot')">🤖</div>
-      <div class="taskbar-icon" onclick="openApp('spotify')">🎧</div>
-      <div class="taskbar-icon" onclick="openApp('snake')">🐍</div>
-      <div class="taskbar-icon" onclick="openApp('minesweeper')">💣</div>
+    <div class="taskbar-left">
+      <button class="taskbar-btn start-btn" onclick="toggleStartMenu()">⊞</button>
+      <button class="taskbar-btn" onclick="openApp('edge')" title="Browser">🌐</button>
+      <button class="taskbar-btn" onclick="openApp('copilot')" title="Copilot AI">🤖</button>
+      <button class="taskbar-btn" onclick="openApp('spotify')" title="Spotify">🎧</button>
+      <button class="taskbar-btn" onclick="openApp('terminal')" title="Terminal">>_</button>
     </div>
-    <div class="clock-widget" id="clock">12:00 PM</div>
+    <div class="taskbar-right">
+      <div class="tray-icons">wifi 🔋</div>
+      <div class="clock" id="clock">12:00 PM</div>
+    </div>
+  </div>
+
+  <div class="start-menu" id="startMenu">
+    <h3>Pinned Apps</h3>
+    <div class="start-grid">
+      <div class="start-item" onclick="openApp('edge')">🌐<span>Edge</span></div>
+      <div class="start-item" onclick="openApp('copilot')">🤖<span>Copilot</span></div>
+      <div class="start-item" onclick="openApp('settings')">⚙️<span>Settings</span></div>
+      <div class="start-item" onclick="openApp('spotify')">🎧<span>Spotify</span></div>
+      <div class="start-item" onclick="openApp('snake')">🐍<span>Snake</span></div>
+      <div class="start-item" onclick="openApp('minesweeper')">💣<span>Minesweeper</span></div>
+      <div class="start-item" onclick="openApp('files')">📁<span>Files</span></div>
+      <div class="start-item" onclick="openApp('terminal')">>_<span>Terminal</span></div>
+    </div>
   </div>
 
   <div class="toast" id="toastNotification">Notification</div>
 
-  <audio id="spotifyAudio"></audio>
-  <input type="file" id="mp3Uploader" accept="audio/mp3,audio/*" style="display: none;" onchange="handleMp3Upload(event)">
+  <audio id="spotifyAudio" preload="auto"></audio>
+  <input type="file" id="mp3Uploader" accept="audio/mp3" style="display:none;" onchange="handleMp3Upload(event)">
 
   <script src="index.js"></script>
 </body>
