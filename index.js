@@ -7,8 +7,8 @@ const tracks = [
 ];
 let currentTrackIdx = 0;
 
-// Embedded Gemini API Key
-const GEMINI_API_KEY = "AQ.Ab8RN6JXLDciN5ELE-gLywA-JCG5Ukm0BQzZ-PzBdpvjXYC3EA";
+// Embedded Gemini API Key (Replace with your valid AIza... key from Google AI Studio)
+const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY";
 
 // Unlock Desktop Function
 function unlockDesktop() {
@@ -67,6 +67,38 @@ document.addEventListener('click', (event) => {
   }
 });
 
+// Window Dragging Logic
+let isDragging = false;
+let startX, startY, initialX, initialY;
+
+function initialiseDrag(e) {
+  if (e.target.closest('.window-controls')) return;
+  isDragging = true;
+  const win = document.getElementById('appWindow');
+  startX = e.clientX;
+  startY = e.clientY;
+  initialX = win.offsetLeft;
+  initialY = win.offsetTop;
+  
+  document.onmousemove = elementDrag;
+  document.onmouseup = stopElementDrag;
+}
+
+function elementDrag(e) {
+  if (!isDragging) return;
+  const win = document.getElementById('appWindow');
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
+  win.style.left = `${initialX + dx}px`;
+  win.style.top = `${initialY + dy}px`;
+}
+
+function stopElementDrag() {
+  isDragging = false;
+  document.onmousemove = null;
+  document.onmouseup = null;
+}
+
 // Window Controls
 function closeWindow() {
   const win = document.getElementById('appWindow');
@@ -101,7 +133,7 @@ function openApp(appKey) {
     case 'spotify':
       title.innerHTML = `<span>🎧</span> Spotify`;
       body.innerHTML = `
-        <div style="display: flex; flex-direction: column; height: 100%; background: #121212; color: white; padding: 20px; box-sizing: border-box; font-family: sans-serif;">
+        <div style="display: flex; flex-direction: column; height: 100%; background: #121212; color: white; padding: 20px; box-sizing: border-box;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0; font-size: 16px;">Your Library</h3>
             <button onclick="document.getElementById('mp3Uploader').click()" style="background: #1db954; color: white; border: none; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 12px;">
@@ -171,7 +203,7 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
       setTimeout(() => document.getElementById('termInput')?.focus(), 100);
       break;
 
-    case 'browser':
+    case 'edge':
       title.innerHTML = `<span>🌐</span> Microsoft Edge`;
       body.innerHTML = `
         <div class="browser-bar">
@@ -216,7 +248,6 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
                 <input type="checkbox" checked onchange="toggleGlassEffect(this.checked)">
               </div>
             </div>
-
             <div class="settings-panel" id="panel-personalization">
               <h2>Personalization</h2>
               <div class="setting-row">
@@ -231,7 +262,6 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
                 <input type="checkbox" onchange="toggleTheme(this.checked)">
               </div>
             </div>
-
             <div class="settings-panel" id="panel-copilot">
               <h2>Copilot AI Settings</h2>
               <div class="setting-row">
@@ -239,7 +269,6 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
                 <input type="checkbox" checked onchange="showToast('Copilot settings updated')">
               </div>
             </div>
-
             <div class="settings-panel" id="panel-privacy">
               <h2>Privacy & Security</h2>
               <div class="setting-row">
@@ -253,7 +282,6 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
       break;
 
     case 'files':
-    case 'pc':
       title.innerHTML = `<span>📁</span> File Explorer`;
       body.innerHTML = `
         <div class="explorer-grid">
