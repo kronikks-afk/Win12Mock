@@ -161,7 +161,7 @@ function openApp(appKey) {
           <div class="terminal-output" id="termOutput">Windows PowerShell [Version 12.0.22621.1]
 (c) Microsoft Corporation. All rights reserved.
 
-Type 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help' to get started.
+Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help' to get started.
 </div>
           <div class="terminal-input-row">
             <span class="terminal-prompt">PS C:\\Users\\User></span>
@@ -589,7 +589,13 @@ function handleTermCommand(event) {
 
     output.innerHTML += `\nPS C:\\Users\\User> ${input.value}\n`;
 
-    if (cmd === 'neofetch') {
+    if (cmd === 'exit') {
+      closeWindow();
+      input.value = '';
+      return;
+    } else if (cmd === 'version' || cmd === 'ver') {
+      output.innerHTML += `Windows 12 Pro (Concept) [Version 12.0.2026.1-web]\n`;
+    } else if (cmd === 'neofetch') {
       const neofetchOutput = `
 <div style="font-family: monospace; white-space: pre; line-height: 1.25; margin-top: 10px;">
 <span style="color: #a020f0;">  0*0-0*0</span> <span style="color: #8a2be2;">0*0-0*0</span>     <span style="color: #a020f0; font-weight:bold;">User</span><span style="color: #00d2ff; font-weight:bold;">@Windows12-PC</span>
@@ -611,7 +617,7 @@ function handleTermCommand(event) {
     } else if (cmd === 'clear') {
       output.innerHTML = '';
     } else if (cmd === 'help') {
-      output.innerHTML += `Commands: neofetch, minesweeper, snake, spotify, clear, help, echo, date\n`;
+      output.innerHTML += `Commands: version, exit, neofetch, minesweeper, snake, spotify, clear, help, echo, date\n`;
     } else if (cmd.startsWith('echo ')) {
       output.innerHTML += cmd.substring(5) + '\n';
     } else if (cmd === 'date') {
