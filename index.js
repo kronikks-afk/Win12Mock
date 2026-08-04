@@ -1,4 +1,4 @@
-// Spotify Audio State & Tracks
+// Spotify Audio State & Default Tracks
 let isPlaying = false;
 const tracks = [
   { name: '1. Lofi Chill Beat', artist: 'Free Ambient', url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3' },
@@ -7,14 +7,12 @@ const tracks = [
 ];
 let currentTrackIdx = 0;
 
-// Unlock Desktop Function with PIN Password Check
+// Unlock Desktop Function
 function unlockDesktop() {
   const passInput = document.getElementById('loginPass');
   const errorMsg = document.getElementById('loginError');
   const loginScreen = document.getElementById('loginScreen');
-
-  // Set PIN password here
-  const correctPin = "1234";
+  const correctPin = "734233";
 
   if (passInput && passInput.value === correctPin) {
     if (loginScreen) {
@@ -61,7 +59,7 @@ function toggleStartMenu() {
 
 document.addEventListener('click', (event) => {
   const startMenu = document.getElementById('startMenu');
-  if (!event.target.closest('.taskbar') && !event.target.closest('.start-menu') && startMenu.classList.contains('active')) {
+  if (startMenu && !event.target.closest('.taskbar') && !event.target.closest('.start-menu') && startMenu.classList.contains('active')) {
     startMenu.classList.remove('active');
   }
 });
@@ -101,21 +99,24 @@ function openApp(appKey) {
       title.innerHTML = `<span>🎧</span> Spotify`;
       body.innerHTML = `
         <div style="display: flex; flex-direction: column; height: 100%; background: #121212; color: white; padding: 20px; box-sizing: border-box; font-family: sans-serif;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; font-size: 16px;">Your Library</h3>
+            <button onclick="document.getElementById('mp3Uploader').click()" style="background: #1db954; color: white; border: none; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 12px;">
+              📁 Upload MP3
+            </button>
+          </div>
+
           <div style="display: flex; align-items: center; gap: 20px; background: #181818; padding: 15px; border-radius: 8px;">
             <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1db954, #191414); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 32px;">🎵</div>
             <div>
-              <div id="trackTitle" style="font-size: 18px; font-weight: bold;">${tracks[currentTrackIdx].name}</div>
-              <div id="trackArtist" style="color: #b3b3b3; font-size: 14px; margin-top: 4px;">${tracks[currentTrackIdx].artist}</div>
+              <div id="trackTitle" style="font-size: 18px; font-weight: bold;">${tracks[currentTrackIdx] ? tracks[currentTrackIdx].name : 'No Tracks'}</div>
+              <div id="trackArtist" style="color: #b3b3b3; font-size: 14px; margin-top: 4px;">${tracks[currentTrackIdx] ? tracks[currentTrackIdx].artist : ''}</div>
             </div>
           </div>
           
-          <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
-            ${tracks.map((t, idx) => `
-              <div style="display: flex; justify-content: space-between; align-items: center; background: #282828; padding: 10px 15px; border-radius: 4px; cursor: pointer;" onclick="playSelectedTrack(${idx})">
-                <span>${t.name}</span>
-                <span style="color: #1db954; font-size: 12px;">${idx === currentTrackIdx ? '▶ Active' : ''}</span>
-              </div>
-            `).join('')}
+          <div id="playlistContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 180px;">
+            ${renderPlaylist()}
           </div>
 
           <div style="margin-top: auto; background: #181818; padding: 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
@@ -175,11 +176,11 @@ Type 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help' to get started.
       title.innerHTML = `<span>🌐</span> Microsoft Edge`;
       body.innerHTML = `
         <div class="browser-bar">
-          <input type="text" id="browserUrl" placeholder="Search web or type URL..." value="https://lite.duckduckgo.com/lite/" onkeydown="handleBrowserKey(event)">
+          <input type="text" id="browserUrl" placeholder="Search web or type URL..." value="https://wikipedia.org" onkeydown="handleBrowserKey(event)">
           <button onclick="navigateBrowser()">Go</button>
-          <button onclick="openExternalBrowser()" title="Open blocked sites in a new window">↗ New Tab</button>
+          <button onclick="openExternalBrowser()" title="Open site in a new tab">↗ New Tab</button>
         </div>
-        <iframe class="browser-content" id="browserFrame" src="https://lite.duckduckgo.com/lite/"></iframe>
+        <iframe class="browser-content" id="browserFrame" src="https://wikipedia.org"></iframe>
       `;
       break;
 
@@ -271,12 +272,43 @@ Type 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help' to get started.
   }
 }
 
-/* SPOTIFY REAL PLAYER CONTROLS */
+/* SPOTIFY CONTROLS & MP3 UPLOAD LOGIC */
+function renderPlaylist() {
+  return tracks.map((t, idx) => `
+    <div style="display: flex; justify-content: space-between; align-items: center; background: #282828; padding: 10px 15px; border-radius: 4px; cursor: pointer;" onclick="playSelectedTrack(${idx})">
+      <span style="font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%;">${t.name}</span>
+      <span style="color: #1db954; font-size: 12px;">${idx === currentTrackIdx ? '▶ Active' : ''}</span>
+    </div>
+  `).join('');
+}
+
+function handleMp3Upload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const fileUrl = URL.createObjectURL(file);
+  const cleanName = file.name.replace(/\.[^/.]+$/, "");
+
+  const newTrack = {
+    name: cleanName,
+    artist: 'Local Upload',
+    url: fileUrl
+  };
+
+  tracks.push(newTrack);
+  currentTrackIdx = tracks.length - 1;
+
+  showToast(`Uploaded: ${cleanName}`);
+  playSelectedTrack(currentTrackIdx);
+}
+
 function toggleAudio() {
   const audio = document.getElementById('spotifyAudio');
   const btn = document.getElementById('playBtn');
 
-  if (!audio.src) {
+  if (!tracks[currentTrackIdx]) return;
+
+  if (audio.src !== tracks[currentTrackIdx].url) {
     audio.src = tracks[currentTrackIdx].url;
   }
 
@@ -302,11 +334,13 @@ function playSelectedTrack(idx) {
 }
 
 function nextTrack() {
+  if (tracks.length === 0) return;
   currentTrackIdx = (currentTrackIdx + 1) % tracks.length;
   playSelectedTrack(currentTrackIdx);
 }
 
 function prevTrack() {
+  if (tracks.length === 0) return;
   currentTrackIdx = (currentTrackIdx - 1 + tracks.length) % tracks.length;
   playSelectedTrack(currentTrackIdx);
 }
@@ -521,15 +555,21 @@ function navigateBrowser() {
   let query = urlInput.value.trim();
   if (!query) return;
 
+  if (query.includes('google.com') || query.includes('duckduckgo.com')) {
+    showToast('Opening external site in new tab to bypass iframe security...');
+    openExternalBrowser();
+    return;
+  }
+
   if (query.startsWith('http://') || query.startsWith('https://')) {
     frame.src = query;
   } else if (query.includes('.') && !query.includes(' ')) {
     frame.src = 'https://' + query;
     urlInput.value = 'https://' + query;
   } else {
-    frame.src = `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(query)}`;
+    frame.src = `https://wikipedia.org/wiki/${encodeURIComponent(query)}`;
   }
-  showToast('Loading...');
+  showToast('Loading page...');
 }
 
 function openExternalBrowser() {
@@ -582,11 +622,11 @@ function handleTermCommand(event) {
 
     input.value = '';
     const termContainer = document.getElementById('terminal');
-    termContainer.scrollTop = termContainer.scrollHeight;
+    if (termContainer) termContainer.scrollTop = termContainer.scrollHeight;
   }
 }
 
-// Conversational AI Copilot Engine
+// Copilot Engine
 function sendCopilotMsg() {
   const input = document.getElementById('copilotInput');
   const history = document.getElementById('chatHistory');
@@ -605,8 +645,22 @@ function sendCopilotMsg() {
 
 function generateAIResponse(text) {
   const lower = text.toLowerCase();
-  if (lower.includes('hello') || lower.includes('hi')) return "Hello! How can I assist you with your Windows 12 concept today?";
-  if (lower.includes('how are you')) return "I'm doing well! Ready to help you test out the desktop interface.";
-  if (lower.includes('wallpaper') || lower.includes('background')) return "You can change your wallpaper by opening Settings -> Personalization and clicking 'Choose Image'!";
-  return `Got it! Let me know if you need help with apps, browser search, wallpaper settings, or playing games like Snake & Minesweeper!`;
+  
+  if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
+    return "Hello! How can I assist you with your Windows 12 system today?";
+  }
+  if (lower.includes('doing') || lower.includes('how are you')) {
+    return "I'm running smoothly! All systems operational. How are you holding up?";
+  }
+  if (lower.includes('sad') || lower.includes('bad') || lower.includes('help')) {
+    return "I'm here for you! Taking a breather or listening to some lofi tunes in the Spotify app can help turn things around.";
+  }
+  if (lower.includes('game') || lower.includes('play')) {
+    return "You can play Snake or Minesweeper right from the desktop shortcuts or Start menu!";
+  }
+  if (lower.includes('wallpaper') || lower.includes('theme')) {
+    return "Open Settings from the desktop to upload a custom wallpaper or toggle themes!";
+  }
+  
+  return `I understand you said "${text}". You can ask me about system settings, games, terminal commands, or changing wallpapers!`;
 }
