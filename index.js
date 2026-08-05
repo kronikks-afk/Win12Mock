@@ -217,8 +217,7 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
       break;
 
     case 'copilot':
-        <div class="icon-img">🤖</div>
-      title.innerHTML = `<span></span> Copilot 3.2 AI`;
+      title.innerHTML = `<span>🤖</span> Copilot 3.2 AI`;
       body.innerHTML = `
         <div class="copilot-container">
           <div class="chat-history" id="chatHistory">
@@ -669,12 +668,10 @@ async function sendLlamaMsg() {
 
   const userText = input.value.trim();
   
-  // Render user message safely
   history.innerHTML += `<div class="chat-bubble user">${escapeHtml(userText)}</div>`;
   input.value = '';
   history.scrollTop = history.scrollHeight;
 
-  // Temporary "Loading/Thinking" indicator bubble
   const typingId = 'typing-' + Date.now();
   
   if (!llamaEngine && !isLlamaLoading) {
@@ -683,7 +680,6 @@ async function sendLlamaMsg() {
     history.scrollTop = history.scrollHeight;
 
     try {
-      // Initialize lightweight Llama model via WebLLM
       const selectedModel = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
       llamaEngine = await window.webllm.CreateMLCEngine(selectedModel, {
         initProgressCallback: (progress) => {
@@ -710,7 +706,6 @@ async function sendLlamaMsg() {
     history.scrollTop = history.scrollHeight;
   }
 
-  // Generate response from local Llama engine
   try {
     const reply = await llamaEngine.chat.completions.create({
       messages: [
@@ -734,7 +729,6 @@ async function sendLlamaMsg() {
   history.scrollTop = history.scrollHeight;
 }
 
-// Utility to escape HTML to prevent XSS injection in chat bubbles
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.innerText = text;
