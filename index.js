@@ -7,8 +7,9 @@ const tracks = [
 ];
 let currentTrackIdx = 0;
 
-// Embedded Gemini API Key (Replace with your valid AIza... key from Google AI Studio)
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY";
+// WebLLM / Llama Engine state
+let llamaEngine = null;
+let isLlamaLoading = false;
 
 // Unlock Desktop Function
 function unlockDesktop() {
@@ -216,15 +217,15 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
       break;
 
     case 'copilot':
-      title.innerHTML = `<span>🤖</span> Copilot AI`;
+      title.innerHTML = `<span>🦙</span> Llama 3.2 AI`;
       body.innerHTML = `
         <div class="copilot-container">
           <div class="chat-history" id="chatHistory">
-            <div class="chat-bubble ai">Hello! I am Windows 12 Copilot powered by Google Gemini. How can I assist you today?</div>
+            <div class="chat-bubble ai">Hello! I am Llama running locally in your browser via WebLLM. Ask me anything!</div>
           </div>
           <div class="chat-input-box">
-            <input type="text" id="copilotInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') sendCopilotMsg()">
-            <button onclick="sendCopilotMsg()">Send</button>
+            <input type="text" id="copilotInput" placeholder="Ask Llama..." onkeydown="if(event.key==='Enter') sendLlamaMsg()">
+            <button onclick="sendLlamaMsg()">Send</button>
           </div>
         </div>
       `;
@@ -237,7 +238,7 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
           <div class="settings-sidebar">
             <div class="settings-sidebar-item active" onclick="switchSettingsTab('system', this)">System</div>
             <div class="settings-sidebar-item" onclick="switchSettingsTab('personalization', this)">Personalization</div>
-            <div class="settings-sidebar-item" onclick="switchSettingsTab('copilot', this)">Copilot AI</div>
+            <div class="settings-sidebar-item" onclick="switchSettingsTab('copilot', this)">Llama AI</div>
             <div class="settings-sidebar-item" onclick="switchSettingsTab('privacy', this)">Privacy</div>
           </div>
           <div class="settings-content">
@@ -263,10 +264,10 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
               </div>
             </div>
             <div class="settings-panel" id="panel-copilot">
-              <h2>Copilot AI Settings</h2>
+              <h2>Llama AI Settings</h2>
               <div class="setting-row">
-                <span>Enable Smart Suggestions</span>
-                <input type="checkbox" checked onchange="showToast('Copilot settings updated')">
+                <span>Model Engine</span>
+                <span style="font-size: 12px; color: #aaa;">Llama-3.2-1B-Instruct (Browser WebGPU)</span>
               </div>
             </div>
             <div class="settings-panel" id="panel-privacy">
@@ -659,8 +660,8 @@ function handleTermCommand(event) {
   }
 }
 
-/* REAL AI COPILOT ENGINE (GEMINI API) */
-async function sendCopilotMsg() {
+/* REAL LOCAL LLAMA AI ENGINE (WEBLLM) */
+async function sendLlamaMsg() {
   const input = document.getElementById('copilotInput');
   const history = document.getElementById('chatHistory');
   if (!input || !input.value.trim()) return;
@@ -672,54 +673,64 @@ async function sendCopilotMsg() {
   input.value = '';
   history.scrollTop = history.scrollHeight;
 
-  // Temporary "Thinking" indicator
+  // Temporary "Loading/Thinking" indicator bubble
   const typingId = 'typing-' + Date.now();
-  history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Copilot is thinking...</i></div>`;
-  history.scrollTop = history.scrollHeight;
+  
+  if (!llamaEngine && !isLlamaLoading) {
+    isLlamaLoading = true;
+    history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Downloading Llama-3.2-1B model to browser cache (first time takes a moment)...</i></div>`;
+    history.scrollTop = history.scrollHeight;
 
-  // Fetch from Gemini AI API
-  const aiResponse = await fetchRealAIResponse(userText);
-
-  // Update with actual response
-  const typingBubble = document.getElementById(typingId);
-  if (typingBubble) {
-    typingBubble.innerHTML = escapeHtml(aiResponse);
+    try {
+      // Initialize lightweight Llama model via WebLLM
+      const selectedModel = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
+      llamaEngine = await window.webllm.CreateMLCEngine(selectedModel, {
+        initProgressCallback: (progress) => {
+          const bubble = document.getElementById(typingId);
+          if (bubble) bubble.innerHTML = `<i>${escapeHtml(progress.text)}</i>`;
+        }
+      });
+      const bubble = document.getElementById(typingId);
+      if (bubble) bubble.innerHTML = `<i>Llama is ready! Generating response...</i>`;
+    } catch (err) {
+      console.error(err);
+      const bubble = document.getElementById(typingId);
+      if (bubble) bubble.innerHTML = `<i>Error loading Llama model. Make sure your browser supports WebGPU.</i>`;
+      isLlamaLoading = false;
+      return;
+    }
+    isLlamaLoading = false;
+  } else if (isLlamaLoading) {
+    history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Still downloading Llama model weights... Please wait.</i></div>`;
+    history.scrollTop = history.scrollHeight;
+    return;
+  } else {
+    history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Llama is thinking...</i></div>`;
+    history.scrollTop = history.scrollHeight;
   }
-  history.scrollTop = history.scrollHeight;
-}
 
-async function fetchRealAIResponse(userMessage) {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-  const systemInstruction = `You are Windows 12 Copilot, a helpful and intelligent AI assistant inside the Windows 12 Web Concept OS. Keep answers concise, direct, helpful, and friendly. Users can interact with built-in apps like Spotify, Snake, Minesweeper, Settings, Terminal, and Edge Browser.`;
-
+  // Generate response from local Llama engine
   try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: {
-          parts: [{ text: systemInstruction }]
-        },
-        contents: [{
-          parts: [{ text: userMessage }]
-        }]
-      })
+    const reply = await llamaEngine.chat.completions.create({
+      messages: [
+        { role: "system", content: "You are Llama, a helpful AI assistant built into Windows 12 Concept OS." },
+        { role: "user", content: userText }
+      ],
     });
 
-    const data = await response.json();
-    
-    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-      return data.candidates[0].content.parts[0].text;
-    } else if (data.error) {
-      return `API Error: ${data.error.message || 'Check your key permissions.'}`;
-    } else {
-      return "I couldn't process that response right now. Please try again!";
+    const aiText = reply.choices[0].message.content;
+    const typingBubble = document.getElementById(typingId);
+    if (typingBubble) {
+      typingBubble.innerHTML = escapeHtml(aiText);
     }
   } catch (error) {
-    console.error("Gemini API Request Failed:", error);
-    return "Error connecting to AI server. Please check your network connection.";
+    console.error("Llama generation error:", error);
+    const typingBubble = document.getElementById(typingId);
+    if (typingBubble) {
+      typingBubble.innerHTML = "Sorry, I ran into an error generating a response.";
+    }
   }
+  history.scrollTop = history.scrollHeight;
 }
 
 // Utility to escape HTML to prevent XSS injection in chat bubbles
