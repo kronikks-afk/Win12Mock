@@ -1,603 +1,112 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  user-select: none;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows 12 Web Concept</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module">
+    import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+    window.webllm = webllm;
+  </script>
+</head>
+<body>
+
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="user-avatar">👤</div>
+      <h2>User</h2>
+      <div class="pin-container">
+        <input type="password" id="loginPass" placeholder="PIN (734233)" onkeydown="if(event.key==='Enter') unlockDesktop()">
+        <button onclick="unlockDesktop()">→</button>
+      </div>
+      <div class="login-error" id="loginError" style="display:none;">Incorrect PIN. Try 734233</div>
+    </div>
+  </div>
+
+  <div class="desktop" id="desktop">
+    <div class="desktop-grid">
+      <div class="desktop-icon" onclick="openApp('edge')">
+        <div class="icon-img">🌐</div>
+        <span>Edge</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('copilot')">
+        <div class="icon-img">🦙</div>
+        <span>Llama AI</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('settings')">
+        <div class="icon-img">⚙️</div>
+        <span>Settings</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('spotify')">
+        <div class="icon-img">🎧</div>
+        <span>Spotify</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('snake')">
+        <div class="icon-img">🐍</div>
+        <span>Snake</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('minesweeper')">
+        <div class="icon-img">💣</div>
+        <span>Minesweeper</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('files')">
+        <div class="icon-img">📁</div>
+        <span>Files</span>
+      </div>
+      <div class="desktop-icon" onclick="openApp('terminal')">
+        <div class="icon-img">>_</div>
+        <span>Terminal</span>
+      </div>
+    </div>
+
+    <div class="app-window" id="appWindow">
+      <div class="window-header" onmousedown="initialiseDrag(event)">
+        <div class="window-title" id="windowTitle"><span>📂</span> Application</div>
+        <div class="window-controls">
+          <button onclick="minimizeWindow()">🗕</button>
+          <button onclick="maximizeWindow()">🗖</button>
+          <button class="close-btn" onclick="closeWindow()">✕</button>
+        </div>
+      </div>
+      <div class="window-body" id="windowBody">
+        </div>
+    </div>
+  </div>
+
+  <div class="taskbar">
+    <div class="taskbar-left">
+      <button class="taskbar-btn start-btn" onclick="toggleStartMenu()">⊞</button>
+      <button class="taskbar-btn" onclick="openApp('edge')" title="Browser">🌐</button>
+      <button class="taskbar-btn" onclick="openApp('copilot')" title="Llama AI">🦙</button>
+      <button class="taskbar-btn" onclick="openApp('spotify')" title="Spotify">🎧</button>
+      <button class="taskbar-btn" onclick="openApp('terminal')" title="Terminal">>_</button>
+    </div>
+    <div class="taskbar-right">
+      <div class="tray-icons">wifi 🔋</div>
+      <div class="clock" id="clock">12:00 PM</div>
+    </div>
+  </div>
+
+  <div class="start-menu" id="startMenu">
+    <h3>Pinned Apps</h3>
+    <div class="start-grid">
+      <div class="start-item" onclick="openApp('edge')">🌐<span>Edge</span></div>
+      <div class="start-item" onclick="openApp('copilot')">🦙<span>Llama AI</span></div>
+      <div class="start-item" onclick="openApp('settings')">⚙️<span>Settings</span></div>
+      <div class="start-item" onclick="openApp('spotify')">🎧<span>Spotify</span></div>
+      <div class="start-item" onclick="openApp('snake')">🐍<span>Snake</span></div>
+      <div class="start-item" onclick="openApp('minesweeper')">💣<span>Minesweeper</span></div>
+      <div class="start-item" onclick="openApp('files')">📁<span>Files</span></div>
+      <div class="start-item" onclick="openApp('terminal')">>_<span>Terminal</span></div>
+    </div>
+  </div>
 
-body, html {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2560&auto=format&fit=crop') no-repeat center center fixed;
-  background-size: cover;
-  transition: background 0.5s ease;
-}
+  <div class="toast" id="toastNotification">Notification</div>
 
-body.light-theme {
-  background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2560&auto=format&fit=crop') no-repeat center center fixed;
-  background-size: cover;
-}
+  <audio id="spotifyAudio" preload="auto"></audio>
+  <input type="file" id="mp3Uploader" accept="audio/mp3" style="display:none;" onchange="handleMp3Upload(event)">
 
-body.no-glass .app-window, 
-body.no-glass .taskbar, 
-body.no-glass .start-menu,
-body.no-glass .login-card {
-  backdrop-filter: none !important;
-  background: rgba(20, 20, 20, 0.95) !important;
-}
-
-/* LOGIN SCREEN */
-.login-screen {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(40px);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.4s ease;
-}
-
-.login-screen.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.login-card {
-  background: rgba(30, 30, 30, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 40px;
-  border-radius: 20px;
-  text-align: center;
-  color: white;
-  width: 320px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-}
-
-.user-avatar {
-  font-size: 64px;
-  background: rgba(255,255,255,0.1);
-  width: 100px;
-  height: 100px;
-  line-height: 100px;
-  border-radius: 50%;
-  margin: 0 auto 20px auto;
-}
-
-.pin-container {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.pin-container input {
-  flex: 1;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 10px 14px;
-  border-radius: 8px;
-  color: white;
-  font-size: 16px;
-  outline: none;
-}
-
-.pin-container button {
-  background: #0078d4;
-  border: none;
-  color: white;
-  padding: 0 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.login-error {
-  color: #ff4757;
-  font-size: 12px;
-  margin-top: 10px;
-}
-
-/* DESKTOP */
-.desktop {
-  width: 100%;
-  height: calc(100% - 50px);
-  position: relative;
-  padding: 20px;
-}
-
-.desktop-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 80px);
-  grid-auto-rows: 90px;
-  gap: 15px;
-}
-
-.desktop-icon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  cursor: pointer;
-  color: white;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-  transition: background 0.2s;
-}
-
-.desktop-icon:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.icon-img {
-  font-size: 36px;
-  margin-bottom: 5px;
-}
-
-.desktop-icon span {
-  font-size: 12px;
-  text-align: center;
-}
-
-/* TASKBAR */
-.taskbar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 50px;
-  background: rgba(20, 20, 20, 0.75);
-  backdrop-filter: blur(25px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 15px;
-  z-index: 999;
-}
-
-.taskbar-left {
-  display: flex;
-  gap: 8px;
-}
-
-.taskbar-btn {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
-
-.taskbar-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.start-btn {
-  font-size: 22px;
-  color: #00d2ff;
-}
-
-.taskbar-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  color: white;
-  font-size: 13px;
-}
-
-/* START MENU */
-.start-menu {
-  position: absolute;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%) scale(0.95);
-  width: 420px;
-  height: 480px;
-  background: rgba(30, 30, 30, 0.85);
-  backdrop-filter: blur(35px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 25px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  z-index: 998;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
-}
-
-.start-menu.active {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(-50%) scale(1);
-}
-
-.start-menu h3 {
-  color: white;
-  font-size: 14px;
-  margin-bottom: 15px;
-}
-
-.start-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-}
-
-.start-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255,255,255,0.05);
-  padding: 12px 0;
-  border-radius: 10px;
-  color: white;
-  cursor: pointer;
-  font-size: 26px;
-  gap: 6px;
-  transition: background 0.2s;
-}
-
-.start-item:hover {
-  background: rgba(255,255,255,0.15);
-}
-
-.start-item span {
-  font-size: 11px;
-}
-
-/* APP WINDOW */
-.app-window {
-  position: absolute;
-  top: 10%;
-  left: 15%;
-  width: 700px;
-  height: 480px;
-  background: rgba(25, 25, 25, 0.9);
-  backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-  z-index: 100;
-  opacity: 0.001;
-  pointer-events: none;
-  transform: scale(0.95);
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.app-window.active {
-  opacity: 1;
-  pointer-events: auto;
-  transform: scale(1);
-}
-
-.app-window.minimized {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.8) translateY(100px);
-}
-
-.app-window.maximized {
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: calc(100% - 50px) !important;
-  border-radius: 0 !important;
-}
-
-.window-header {
-  height: 40px;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 15px;
-  cursor: grab;
-}
-
-.window-title {
-  color: white;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.window-controls {
-  display: flex;
-  gap: 5px;
-}
-
-.window-controls button {
-  background: transparent;
-  border: none;
-  color: white;
-  width: 30px;
-  height: 28px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.window-controls button:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.window-controls .close-btn:hover {
-  background: #ff4757;
-}
-
-.window-body {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-}
-
-/* BROWSER APP */
-.browser-bar {
-  display: flex;
-  background: #1e1e1e;
-  padding: 8px;
-  gap: 8px;
-  border-bottom: 1px solid #333;
-}
-
-.browser-bar input {
-  flex: 1;
-  background: #111;
-  border: 1px solid #333;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  outline: none;
-  font-size: 13px;
-}
-
-.browser-bar button {
-  background: #333;
-  color: white;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.browser-content {
-  width: 100%;
-  height: calc(100% - 41px);
-  border: none;
-  background: white;
-}
-
-/* TERMINAL APP */
-.terminal-container {
-  background: #0c0c0c;
-  color: #cccccc;
-  font-family: 'Consolas', monospace;
-  height: 100%;
-  padding: 15px;
-  overflow-y: auto;
-  font-size: 13px;
-}
-
-.terminal-output {
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
-.terminal-input-row {
-  display: flex;
-  margin-top: 5px;
-}
-
-.terminal-prompt {
-  color: #61afef;
-  margin-right: 8px;
-}
-
-.terminal-input {
-  background: transparent;
-  border: none;
-  color: white;
-  outline: none;
-  flex: 1;
-  font-family: 'Consolas', monospace;
-  font-size: 13px;
-}
-
-/* COPILOT APP */
-.copilot-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: #18181b;
-}
-
-.chat-history {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.chat-bubble {
-  max-width: 75%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 13px;
-  line-height: 1.4;
-  color: white;
-}
-
-.chat-bubble.ai {
-  background: #27272a;
-  align-self: flex-start;
-  border-bottom-left-radius: 2px;
-}
-
-.chat-bubble.user {
-  background: #6366f1;
-  align-self: flex-end;
-  border-bottom-right-radius: 2px;
-}
-
-.chat-input-box {
-  padding: 15px;
-  background: #18181b;
-  border-top: 1px solid #27272a;
-  display: flex;
-  gap: 10px;
-}
-
-.chat-input-box input {
-  flex: 1;
-  background: #27272a;
-  border: 1px solid #3f3f46;
-  padding: 10px 14px;
-  border-radius: 8px;
-  color: white;
-  outline: none;
-}
-
-.chat-input-box button {
-  background: #6366f1;
-  border: none;
-  color: white;
-  padding: 0 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-/* SETTINGS APP */
-.settings-layout {
-  display: flex;
-  height: 100%;
-  background: #18181b;
-  color: white;
-}
-
-.settings-sidebar {
-  width: 180px;
-  background: rgba(0,0,0,0.2);
-  border-right: 1px solid #27272a;
-  padding: 15px 0;
-}
-
-.settings-sidebar-item {
-  padding: 10px 20px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.settings-sidebar-item:hover, .settings-sidebar-item.active {
-  background: rgba(255,255,255,0.08);
-}
-
-.settings-content {
-  flex: 1;
-  padding: 25px;
-  overflow-y: auto;
-}
-
-.settings-panel {
-  display: none;
-}
-
-.settings-panel.active {
-  display: block;
-}
-
-.settings-panel h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
-}
-
-.setting-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #27272a;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  font-size: 13px;
-}
-
-.upload-btn {
-  background: #3b82f6;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-/* FILE EXPLORER */
-.explorer-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 100px);
-  gap: 20px;
-  padding: 25px;
-  background: #18181b;
-  height: 100%;
-}
-
-.explorer-folder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: white;
-  cursor: pointer;
-  padding: 15px;
-  border-radius: 8px;
-}
-
-.explorer-folder:hover {
-  background: rgba(255,255,255,0.08);
-}
-
-/* TOAST NOTIFICATION */
-.toast {
-  position: fixed;
-  bottom: 70px;
-  right: 20px;
-  background: #27272a;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  border: 1px solid #3f3f46;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  font-size: 13px;
-  z-index: 10000;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
-  pointer-events: none;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
-}
+  <script src="index.js"></script>
+</body>
+</html>
