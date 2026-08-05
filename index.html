@@ -17,7 +17,7 @@
       <div class="user-avatar">👤</div>
       <h2>User</h2>
       <div class="pin-container">
-        <input type="password" id="loginPass" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') unlockDesktop()">
+        <input type="password" id="loginPass" placeholder="Enter PIN (734233)" onkeydown="if(event.key==='Enter') unlockDesktop()">
         <button onclick="unlockDesktop()">→</button>
       </div>
       <div class="login-error" id="loginError" style="display:none;">Incorrect PIN. Try Again.</div>
@@ -106,6 +106,6 @@
   <audio id="spotifyAudio" preload="auto"></audio>
   <input type="file" id="mp3Uploader" accept="audio/mp3" style="display:none;" onchange="handleMp3Upload(event)">
 
-  <script src="index.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
