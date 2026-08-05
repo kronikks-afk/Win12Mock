@@ -678,7 +678,7 @@ async function sendLlamaMsg() {
   
   if (!llamaEngine && !isLlamaLoading) {
     isLlamaLoading = true;
-    history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Downloading Llama-3.2-1B model to browser cache (first time takes a moment)...</i></div>`;
+    history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Downloading Copilot-3.2-1B model to browser cache (first time takes a moment)...</i></div>`;
     history.scrollTop = history.scrollHeight;
 
     try {
@@ -691,21 +691,21 @@ async function sendLlamaMsg() {
         }
       });
       const bubble = document.getElementById(typingId);
-      if (bubble) bubble.innerHTML = `<i>Llama is ready! Generating response...</i>`;
+      if (bubble) bubble.innerHTML = `<i>Copilot is ready! Generating response...</i>`;
     } catch (err) {
       console.error(err);
       const bubble = document.getElementById(typingId);
-      if (bubble) bubble.innerHTML = `<i>Error loading Llama model. Make sure your browser supports WebGPU.</i>`;
+      if (bubble) bubble.innerHTML = `<i>Error loading Copilot model. Make sure your browser supports WebGPU.</i>`;
       isLlamaLoading = false;
       return;
     }
     isLlamaLoading = false;
   } else if (isLlamaLoading) {
-    history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Still downloading Llama model weights... Please wait.</i></div>`;
+    history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Still downloading Copilot model weights... Please wait.</i></div>`;
     history.scrollTop = history.scrollHeight;
     return;
   } else {
-    history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Llama is thinking...</i></div>`;
+    history.innerHTML += `<div class="chat-bubble ai" id="${typingId}"><i>Copilot is thinking...</i></div>`;
     history.scrollTop = history.scrollHeight;
   }
 
@@ -713,7 +713,7 @@ async function sendLlamaMsg() {
   try {
     const reply = await llamaEngine.chat.completions.create({
       messages: [
-        { role: "system", content: "You are Llama, a helpful AI assistant built into Windows 12 Concept OS." },
+        { role: "system", content: "You are Windows Copilot, a helpful AI assistant built into Windows 12 Concept OS." },
         { role: "user", content: userText }
       ],
     });
