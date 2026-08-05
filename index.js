@@ -217,14 +217,15 @@ Type 'version', 'exit', 'neofetch', 'minesweeper', 'snake', 'spotify', or 'help'
       break;
 
     case 'copilot':
-      title.innerHTML = `<span>🦙</span> Llama 3.2 AI`;
+        <div class="icon-img">🤖</div>
+      title.innerHTML = `<span></span> Copilot 3.2 AI`;
       body.innerHTML = `
         <div class="copilot-container">
           <div class="chat-history" id="chatHistory">
-            <div class="chat-bubble ai">Hello! I am Llama running locally in your browser via WebLLM. Ask me anything!</div>
+            <div class="chat-bubble ai">Hello! I am Copilot running locally in your browser via WebLLM. Ask me anything!</div>
           </div>
           <div class="chat-input-box">
-            <input type="text" id="copilotInput" placeholder="Ask Llama..." onkeydown="if(event.key==='Enter') sendLlamaMsg()">
+            <input type="text" id="copilotInput" placeholder="Ask Copilot..." onkeydown="if(event.key==='Enter') sendLlamaMsg()">
             <button onclick="sendLlamaMsg()">Send</button>
           </div>
         </div>
