@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Windows 12 Web Concept</title>
   <link rel="stylesheet" href="style.css">
+  <script type="module">
+    import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+    window.webllm = webllm;
+  </script>
 </head>
 <body>
 
@@ -27,8 +31,8 @@
         <span>Edge</span>
       </div>
       <div class="desktop-icon" onclick="openApp('copilot')">
-        <div class="icon-img">🤖</div>
-        <span>Copilot</span>
+        <div class="icon-img">🦙</div>
+        <span>Llama AI</span>
       </div>
       <div class="desktop-icon" onclick="openApp('settings')">
         <div class="icon-img">⚙️</div>
@@ -74,7 +78,7 @@
     <div class="taskbar-left">
       <button class="taskbar-btn start-btn" onclick="toggleStartMenu()">⊞</button>
       <button class="taskbar-btn" onclick="openApp('edge')" title="Browser">🌐</button>
-      <button class="taskbar-btn" onclick="openApp('copilot')" title="Copilot AI">🤖</button>
+      <button class="taskbar-btn" onclick="openApp('copilot')" title="Llama AI">🦙</button>
       <button class="taskbar-btn" onclick="openApp('spotify')" title="Spotify">🎧</button>
       <button class="taskbar-btn" onclick="openApp('terminal')" title="Terminal">>_</button>
     </div>
@@ -88,7 +92,7 @@
     <h3>Pinned Apps</h3>
     <div class="start-grid">
       <div class="start-item" onclick="openApp('edge')">🌐<span>Edge</span></div>
-      <div class="start-item" onclick="openApp('copilot')">🤖<span>Copilot</span></div>
+      <div class="start-item" onclick="openApp('copilot')">🦙<span>Llama AI</span></div>
       <div class="start-item" onclick="openApp('settings')">⚙️<span>Settings</span></div>
       <div class="start-item" onclick="openApp('spotify')">🎧<span>Spotify</span></div>
       <div class="start-item" onclick="openApp('snake')">🐍<span>Snake</span></div>
